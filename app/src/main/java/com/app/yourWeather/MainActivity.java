@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getWeather(String city) {
-        String apiKey = "YOUR_API_KEY";
+        String apiKey = "bb5513fbf37527fb5fbee4af5b78a8b7";
 
         Call<WeatherResponse> call = weatherApi.getWeather(city, apiKey);
         call.enqueue(new Callback<WeatherResponse>() {
@@ -62,11 +62,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
                 if (response.isSuccessful()) {
                     // Обработка данных о погоде
-                    // Например:
-                    // WeatherResponse weatherResponse = response.body();
-                    // MainWeatherInfo mainInfo = weatherResponse.getMainInfo();
-                    // String temperature = String.valueOf(mainInfo.getTemperature());
-                    // textViewWeather.setText("Температура: " + temperature + "°C");
+
                 } else {
                     Toast.makeText(MainActivity.this, "Ошибка запроса: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
