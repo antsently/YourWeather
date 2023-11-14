@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="txtCity">Введите город</string>
-    <string name="Search">Найти</string>
-    <string name="aTemp">неизвестно</string>
-    <string name="humDity">неизвестно</string>
-    <string name="winD">неизвестно</string>
-    <string name="txtHum">Влажность:</string>
-    <string name="txtTemp">Температура:</string>
+
 </resources>

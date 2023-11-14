@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,98 +6,57 @@
     android:fitsSystemWindows="true"
     tools:context=".GlobalWeather">
 
-    <EditText
-        android:id="@+id/city_input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:hint="@string/txtCity"
+    <FrameLayout
+        android:layout_width="409dp"
+        android:layout_height="379dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <Button
-        android:id="@+id/search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/Search"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/city_input"
-        app:layout_constraintVertical_bias="0.012" />
-
-    <ImageView
-        android:id="@+id/weather_image"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toTopOf="@id/weather_info_layout"
-        app:layout_constraintDimensionRatio="H,1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_button"
-        app:layout_constraintVertical_bias="0.3" />
-
-
-    <LinearLayout
-        android:id="@+id/weather_info_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/weather_image"
-        app:layout_constraintVertical_bias="0.322">
-
-        <LinearLayout
+        <ImageView
+            android:id="@+id/weatherPicture"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/cloud" />
+
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="111dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_gravity="center"
+            android:layout_marginTop="26dp"
+            android:text="Город"
+            android:textAlignment="center"
+            android:textColor="@android:color/white" />
 
-            <TextView
-                android:id="@+id/temperature_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/txtTemp" />
-
-            <TextView
-                android:id="@+id/temperature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/aTemp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/temperature"
+            android:layout_width="111dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:text="Температура"
+            android:textColor="@android:color/white"
+            android:background="@android:color/transparent"
+            app:layout_constraintTop_toBottomOf="@id/location"
+            app:layout_constraintStart_toStartOf="@id/location"
+            android:layout_marginTop="48dp" />
 
-            <TextView
-                android:id="@+id/humidity_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/txtHum" />
+        <TextView
+            android:id="@+id/weatherType"
+            android:layout_width="111dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="70dp"
+            android:autoSizeTextType="uniform"
+            android:background="@android:color/transparent"
+            android:text="Тип погоды"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            app:layout_constraintStart_toStartOf="@id/temperature"
+            app:layout_constraintTop_toBottomOf="@id/temperature" />
 
-            <TextView
-                android:id="@+id/humidity"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="@string/humDity" />
-        </LinearLayout>
-
-    </LinearLayout>
-
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
