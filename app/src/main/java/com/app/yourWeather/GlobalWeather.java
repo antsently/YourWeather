@@ -14,9 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.app.yourWeather.R;
-import com.app.yourWeather.WeatherResponse;
-import com.app.yourWeather.WeatherService;
 import com.bumptech.glide.Glide;
 import retrofit2.Call;
 import retrofit2.Callback;
