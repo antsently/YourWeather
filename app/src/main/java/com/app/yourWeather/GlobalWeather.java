@@ -2,14 +2,21 @@ package com.app.yourWeather;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -21,19 +28,19 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class GlobalWeather extends AppCompatActivity {
+public class GlobalWeather extends AppCompatActivity implements LocationListener {
 
     private TextView locationTextView;
     private TextView temperatureTextView;
     private TextView weatherTypeTextView;
     private ImageView weatherImageView;
+    private ProgressBar progressBar;
 
     private static final String BASE_URL = "https://api.openweathermap.org/data/2.5/";
     private static final String API_KEY = "064b58d59c738d8cff7324094ae5e0cd";
 
     private static final int REQUEST_LOCATION_PERMISSION = 1;
 
-    /*Какой-то ебучий код для проверки и небольшой дефолтной логики*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +50,7 @@ public class GlobalWeather extends AppCompatActivity {
         temperatureTextView = findViewById(R.id.temperature);
         weatherTypeTextView = findViewById(R.id.weatherType);
         weatherImageView = findViewById(R.id.weatherPicture);
+        progressBar = findViewById(R.id.progressBar);
 
         // Проверяем, есть ли у нас разрешение на доступ к местоположению
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -65,32 +73,91 @@ public class GlobalWeather extends AppCompatActivity {
             } else {
                 // Разрешение не предоставлено, обрабатываем ситуацию
                 // Можете показать пользователю сообщение о том, что без разрешения GPS приложение не сможет корректно работать
+                showLocationPermissionError();
             }
         }
+    }
+
+    // Дополнительный метод для отображения сообщения об ошибке и кнопки "Включить GPS"
+    private void showLocationPermissionError() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Ошибка доступа к местоположению");
+        builder.setMessage("Для корректной работы приложения необходим доступ к местоположению. Пожалуйста, предоставьте разрешение в настройках приложения.");
+        builder.setPositiveButton("Включить GPS", (dialog, which) -> {
+            // Здесь можно добавить код для перехода в настройки приложения
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()));
+            startActivity(intent);
+        });
+        builder.setNegativeButton("Отмена", (dialog, which) -> {
+            // Здесь можно добавить код для обработки отказа пользователя
+        });
+        builder.show();
     }
 
     private void getLocation() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        // Проверяем, есть ли у нас разрешение на доступ к местоположению
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            // Попытка получить текущее местоположение с использованием LocationListener
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
-            if (location != null) {
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-
-                // Вызываем метод для получения погоды
-                getWeather(latitude, longitude);
+            // Если координаты не будут получены через LocationListener, вы можете использовать getLastKnownLocation
+            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (lastKnownLocation != null) {
+                handleLocation(lastKnownLocation);
             } else {
+                Log.e("WeatherError", "Last known location is null");
                 // Если координаты не доступны, можно использовать значения по умолчанию
                 getWeather(0.0, 0.0);
             }
         }
     }
 
+    private void handleLocation(Location location) {
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+
+        Log.d("WeatherDebug", "Latitude: " + latitude);
+        Log.d("WeatherDebug", "Longitude: " + longitude);
+
+        // Вызываем метод для получения погоды
+        getWeather(latitude, longitude);
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        // Получено новое местоположение через LocationListener
+        handleLocation(location);
+
+        // Прекращаем прослушивание местоположения, чтобы избежать постоянных обновлений
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.removeUpdates(this);
+    }
+
+    // Другие методы интерфейса LocationListener, которые могут понадобиться вам
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
+
+    @Override
+    public void onProviderEnabled(@NonNull String provider) {
+    }
+
+    @Override
+    public void onProviderDisabled(@NonNull String provider) {
+    }
+
     private void getWeather(double latitude, double longitude) {
+
+        TextView latitudeTextView = findViewById(R.id.latitude);
+        TextView longitudeTextView = findViewById(R.id.longitude);
+
+        latitudeTextView.setText(String.format("%.6f", latitude));
+        longitudeTextView.setText(String.format("%.6f", longitude));
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -102,6 +169,8 @@ public class GlobalWeather extends AppCompatActivity {
         call.enqueue(new Callback<WeatherResponse>() {
             @Override
             public void onResponse(@NonNull Call<WeatherResponse> call, @NonNull Response<WeatherResponse> response) {
+                progressBar.setVisibility(View.GONE);
+
                 if (response.isSuccessful()) {
                     WeatherResponse weatherResponse = response.body();
 
@@ -120,6 +189,8 @@ public class GlobalWeather extends AppCompatActivity {
                         Log.d("WeatherDebug", "Temperature: " + weatherResponse.getMain().getTemperature());
                         Log.d("WeatherDebug", "Weather Type: " + weatherResponse.getWeather()[0].getWeatherType());
 
+                        // После успешного получения данных изменяем видимость элементов
+                        findViewById(R.id.frameLayout).setVisibility(View.VISIBLE);
                     } else {
                         Log.e("WeatherError", "Failed to get weather data. Code: " + response.code());
                     }
@@ -129,6 +200,7 @@ public class GlobalWeather extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<WeatherResponse> call, @NonNull Throwable t) {
                 // Обработка ошибок
+                progressBar.setVisibility(View.GONE);
             }
         });
     }
