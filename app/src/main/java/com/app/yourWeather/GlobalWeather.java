@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -22,6 +23,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -109,7 +114,7 @@ public class GlobalWeather extends AppCompatActivity implements LocationListener
             if (lastKnownLocation != null) {
                 handleLocation(lastKnownLocation);
             } else {
-                Log.e("WeatherError", "Last known location is null");
+                Log.e("WeatherDebug", "Last known location is null");
                 // Если координаты не доступны, можно использовать значения по умолчанию
                 getWeather(0.0, 0.0);
             }
@@ -182,7 +187,7 @@ public class GlobalWeather extends AppCompatActivity implements LocationListener
                         float temperatureCelsius = temperatureKelvin - 273.15f;
                         temperatureTextView.setText(String.format("%.1f°C", temperatureCelsius));
 
-                        String weatherType = translateWeatherType(weatherResponse.getWeather()[0].getWeatherType());
+                        String weatherType = setWeatherData(weatherResponse.getWeather()[0].getWeatherType());
                         weatherTypeTextView.setText(weatherType);
 
                         Log.d("WeatherDebug", "City: " + weatherResponse.getCityName());
@@ -205,61 +210,28 @@ public class GlobalWeather extends AppCompatActivity implements LocationListener
         });
     }
 
-    private String translateWeatherType(String weatherType) {
-        String translatedWeatherType;
-        switch (weatherType) {
-            case "Clear":
-                setWeatherImage("clear");
-                translatedWeatherType = "Ясно";
-                break;
-            case "Clouds":
-                setWeatherImage("cloud");
-                translatedWeatherType = "Облачно";
-                break;
-            case "Mist":
-                setWeatherImage("mist");
-                translatedWeatherType = "Туман";
-                break;
-            case "Rain":
-                setWeatherImage("rain");
-                translatedWeatherType = "Дождь";
-                break;
-            case "Snow":
-                setWeatherImage("snow");
-                translatedWeatherType = "Снег";
-                break;
-            default:
-                setWeatherImage("clear"); // По умолчанию
-                translatedWeatherType = "Неопределенно";
-                break;
-        }
+    private String setWeatherData(String weatherType) {
+        // Маппинг типов погоды на соответствующие ресурсы изображений и текст
+        Map<String, Pair<Integer, String>> weatherData = new HashMap<>();
+        weatherData.put("Clear", new Pair<>(R.drawable.clear, "Ясно"));
+        weatherData.put("Clouds", new Pair<>(R.drawable.cloud, "Облачно"));
+        weatherData.put("Mist", new Pair<>(R.drawable.mist, "Туман"));
+        weatherData.put("Rain", new Pair<>(R.drawable.rain, "Дождь"));
+        weatherData.put("Snow", new Pair<>(R.drawable.snow, "Снег"));
+
+        // Получение данных из маппинга
+        Pair<Integer, String> data = weatherData.getOrDefault(weatherType, new Pair<>(R.drawable.clear, "Неопределенно"));
+        int imageResource = data.first;
+        String translatedWeatherType = data.second;
+
+        // Установка изображения
+        Glide.with(this).load(imageResource).into(weatherImageView);
+
+        // Установка текста
+        weatherTypeTextView.setText(translatedWeatherType);
+
+        // Возвращаем строку с типом погоды
         return translatedWeatherType;
     }
 
-    private void setWeatherImage(String weatherType) {
-        int imageResource;
-
-        switch (weatherType) {
-            case "clear":
-                imageResource = R.drawable.clear;
-                break;
-            case "cloud":
-                imageResource = R.drawable.cloud;
-                break;
-            case "mist":
-                imageResource = R.drawable.mist;
-                break;
-            case "rain":
-                imageResource = R.drawable.rain;
-                break;
-            case "snow":
-                imageResource = R.drawable.snow;
-                break;
-            default:
-                imageResource = R.drawable.clear; // По умолчанию
-                break;
-        }
-
-        Glide.with(this).load(imageResource).into(weatherImageView);
-    }
 }
