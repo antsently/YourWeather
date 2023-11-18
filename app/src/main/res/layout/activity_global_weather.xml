@@ -17,23 +17,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/weatherPicture"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="200dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="200dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/cloud" />
-
         <LinearLayout
+            android:id="@+id/textLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_gravity="top"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
             android:background="@drawable/rounded_background"
             android:elevation="8dp"
             android:orientation="vertical"
@@ -43,7 +34,7 @@
                 android:id="@+id/location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Город"
+                android:text="нет данных"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="20sp" />
@@ -52,7 +43,7 @@
                 android:id="@+id/temperature"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Температура"
+                android:text="нет данных"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="24sp" />
@@ -61,7 +52,7 @@
                 android:id="@+id/weatherType"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Тип погоды"
+                android:text="нет данных"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
@@ -162,7 +153,22 @@
 
             </LinearLayout>
         </LinearLayout>
-    </FrameLayout>
 
+        <ImageView
+            android:id="@+id/weatherPicture"
+            android:layout_width="190dp"
+            android:layout_height="190dp"
+            android:layout_gravity="right"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
+            android:padding="20dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@id/textLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/textLayout"
+            app:layout_constraintTop_toTopOf="@id/textLayout" />
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
