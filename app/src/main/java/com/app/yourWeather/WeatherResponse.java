@@ -37,7 +37,7 @@ class MainWeatherInfo {
     private double temperature;
 
     @SerializedName("pressure")
-    private double pressure; // Добавим давление
+    private double pressure;
 
     public double getTemperature() {
         return temperature;
@@ -47,10 +47,6 @@ class MainWeatherInfo {
         return pressure;
     }
 }
-
-// Остальные классы оставим без изменений
-
-
 class WeatherMainInfo {
     @SerializedName("temp")
     private double temperature;

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.Manifest;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -69,8 +70,6 @@ public class GlobalWeather extends AppCompatActivity {
                 // Здесь можно прекратить запросы на местоположение, если нужно
                 locationManager.removeUpdates(this);
             }
-
-            // Остальные методы LocationListener
         };
 
         // Проверка разрешений перед запросом на обновление местоположения
@@ -82,6 +81,24 @@ public class GlobalWeather extends AppCompatActivity {
 
             // Добавление NETWORK_PROVIDER
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 10, locationListener);
+        } else {
+            // Разрешения не предоставлены, вывести сообщение пользователю
+            Toast.makeText(this, "Приложению необходим доступ к местоположению для работы", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Обработка результатов запроса разрешений
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Разрешение предоставлено, получаем местоположение
+                getLocation();
+            } else {
+                // Разрешение не предоставлено, вывести сообщение пользователю
+                Toast.makeText(this, "Приложению необходим доступ к местоположению для работы", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -151,68 +168,65 @@ public class GlobalWeather extends AppCompatActivity {
         }
     }
 
-    // Обработка результатов запроса разрешений
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Разрешение предоставлено, получаем местоположение
-                getLocation();
+    // Класс для загрузки данных о погоде
+    private class WeatherHelper {
+        private long lastRequestTime = 0;
+        private int requestCount = 0;
+
+        public void loadWeatherData(double latitude, double longitude) {
+            long currentTime = System.currentTimeMillis();
+            long elapsedTimeSinceLastRequest = currentTime - lastRequestTime;
+            if (elapsedTimeSinceLastRequest >= 3600000) { // Проверка прошедшего времени (1 час = 3600000 мс)
+                // Если прошло более 1 часа с последнего запроса, сбрасываем счетчик запросов
+                requestCount = 0;
+            }
+
+            if (requestCount < 3) { // Проверка количества запросов
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(BASE_URL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                WeatherService service = retrofit.create(WeatherService.class);
+                Call<WeatherResponse> call = service.getWeather(latitude, longitude, UNITS_METRIC, UNITS_LANG, API_KEY);
+                call.enqueue(new Callback<WeatherResponse>() {
+                    @Override
+                    public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            WeatherResponse weatherResponse = response.body();
+                            String city = weatherResponse.getCityName();
+                            double temperature = weatherResponse.getMainWeatherInfo().getTemperature();
+                            double windSpeed = weatherResponse.getWindInfo().getSpeed();
+                            double windDirection = weatherResponse.getWindInfo().getDirection();
+                            double pressure = weatherResponse.getMainWeatherInfo().getPressure();
+                            double latitude = weatherResponse.getCoordinates().getLatitude();
+                            double longitude = weatherResponse.getCoordinates().getLongitude();
+                            long endTime = System.currentTimeMillis();
+                            long elapsedTime = endTime - currentTime;
+                            Log.d("WeatherData", "Получены данные для " + city + " за " + elapsedTime + " мс");
+                            updateLocationTextView(city);
+                            updateTemperatureTextView(temperature);
+                            updateWindTextView(windSpeed, windDirection);
+                            updatePressureTextView(pressure);
+                            updateLatitudeTextView(latitude);
+                            updateLongitudeTextView(longitude);
+
+                            // Обновляем время последнего запроса и увеличиваем счетчик запросов
+                            lastRequestTime = System.currentTimeMillis();
+                            requestCount++;
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<WeatherResponse> call, Throwable t) {
+                        Log.e("WeatherData", "Ошибка получения данных о погоде: " + t.getMessage());
+                    }
+                });
             } else {
-                // Разрешение не предоставлено, обработайте этот случай
+                // Если достигнуто максимальное количество запросов, выведите сообщение пользователю
+                Toast.makeText(GlobalWeather.this, "Достигнуто максимальное количество запросов к API за час. Попробуйте через час =)", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    // Класс для загрузки данных о погоде
-    private class WeatherHelper {
-        public void loadWeatherData(double latitude, double longitude) {
-
-            long startTime = System.currentTimeMillis(); // Добавление переменной startTime
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-
-            WeatherService service = retrofit.create(WeatherService.class);
-
-            Call<WeatherResponse> call = service.getWeather(latitude, longitude, UNITS_METRIC, UNITS_LANG, API_KEY);
-            call.enqueue(new Callback<WeatherResponse>() {
-                @Override
-                public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        WeatherResponse weatherResponse = response.body();
-                        String city = weatherResponse.getCityName();
-                        double temperature = weatherResponse.getMainWeatherInfo().getTemperature();
-                        double windSpeed = weatherResponse.getWindInfo().getSpeed();
-                        double windDirection = weatherResponse.getWindInfo().getDirection();
-                        double pressure = weatherResponse.getMainWeatherInfo().getPressure();
-                        double latitude = weatherResponse.getCoordinates().getLatitude();
-                        double longitude = weatherResponse.getCoordinates().getLongitude();
-
-                        long endTime = System.currentTimeMillis(); // Получение времени окончания запроса
-                        long elapsedTime = endTime - startTime; // Вычисление времени запроса
-
-                        // Добавление логов с данными и временем запроса
-                        Log.d("WeatherData", "Получены данные для " + city + " за " + elapsedTime + " мс");
-
-                        updateLocationTextView(city);
-                        updateTemperatureTextView(temperature);
-                        updateWindTextView(windSpeed, windDirection);
-                        updatePressureTextView(pressure);
-                        updateLatitudeTextView(latitude);
-                        updateLongitudeTextView(longitude);
-                    }
-                }
-                @Override
-                public void onFailure(Call<WeatherResponse> call, Throwable t) {
-                    // Обработка ошибки при выполнении запроса
-
-                    Log.e("WeatherData", "Ошибка получения данных о погоде: " + t.getMessage());
-                }
-            });
-        }
-    }
 }
