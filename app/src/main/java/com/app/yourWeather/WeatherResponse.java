@@ -15,6 +15,24 @@ public class WeatherResponse {
     @SerializedName("coord")
     private Coordinates coordinates;
 
+    @SerializedName("weather")
+    private WeatherDetails[] weatherDetails;
+
+    @SerializedName("visibility")
+    private int visibility;
+
+    @SerializedName("sys")
+    private SystemInfo systemInfo;
+
+    @SerializedName("rain")
+    private RainInfo rainInfo;
+
+    @SerializedName("snow")
+    private SnowInfo snowInfo;
+
+    @SerializedName("clouds")
+    private Clouds clouds;
+
     public String getCityName() {
         return cityName;
     }
@@ -31,12 +49,36 @@ public class WeatherResponse {
         return coordinates;
     }
 
+    public WeatherDetails[] getWeatherDetails() {
+        return weatherDetails;
+    }
+
+    public int getVisibility() {
+        return visibility;
+    }
+
+    public SystemInfo getSystemInfo() {
+        return systemInfo;
+    }
+
+    public RainInfo getRainInfo() {
+        return rainInfo;
+    }
+
+    public SnowInfo getSnowInfo() {
+        return snowInfo;
+    }
+
+    public Clouds getClouds() {
+        return clouds;
+    }
+
     static class MainWeatherInfo {
         @SerializedName("temp")
         private double temperature;
 
         @SerializedName("feels_like")
-        private double feelsLikeTemperature; // Температура по ощущениям
+        private double feelsLikeTemperature;
 
         @SerializedName("pressure")
         private double pressure;
@@ -105,5 +147,80 @@ public class WeatherResponse {
         public double getLongitude() {
             return longitude;
         }
+    }
+
+    static class WeatherDetails {
+        @SerializedName("main")
+        private String weatherMain;
+
+        public String getWeatherMain() {
+            return weatherMain;
+        }
+
+        public double getSnowVolume() {
+            return 0;
+        }
+
+        public double getRainVolume() {
+            return 0;
+        }
+    }
+
+    static class SystemInfo {
+        @SerializedName("sunrise")
+        private long sunrise;
+
+        @SerializedName("sunset")
+        private long sunset;
+
+        public long getSunrise() {
+            return sunrise;
+        }
+
+        public long getSunset() {
+            return sunset;
+        }
+    }
+
+    static class RainInfo {
+        @SerializedName("1h")
+        private double rainVolume;
+
+        public double getRainVolume() {
+            return rainVolume;
+        }
+    }
+
+    static class SnowInfo {
+        @SerializedName("1h")
+        private double snowVolume;
+
+        public double getSnowVolume() {
+            return snowVolume;
+        }
+    }
+
+    static class Clouds {
+        @SerializedName("all")
+        private int cloudiness;
+
+        public int getCloudiness() {
+            return cloudiness;
+        }
+    }
+
+    // Добавлены методы для получения объема дождя и снега
+    public double getRainVolume() {
+        if (rainInfo != null) {
+            return rainInfo.getRainVolume();
+        }
+        return 0.0;
+    }
+
+    public double getSnowVolume() {
+        if (snowInfo != null) {
+            return snowInfo.getSnowVolume();
+        }
+        return 0.0;
     }
 }

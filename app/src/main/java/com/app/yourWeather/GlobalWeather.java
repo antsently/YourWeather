@@ -1,20 +1,29 @@
 package com.app.yourWeather;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.TextView;
 import android.Manifest;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import retrofit2.Call;
@@ -47,8 +56,28 @@ public class GlobalWeather extends AppCompatActivity {
             getLocation();
         }
     }
+
+    // Проверка включенности GPS
+    private boolean isGPSEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    // Проверка подключения к интернету
+    private boolean isInternetConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
     // Получение данных о местоположении
     private void getLocation() {
+        if (!isGPSEnabled() || !isInternetConnected()) {
+            // Если GPS или интернет отключены, показать пользователю сообщение
+            showEnableLocationDialog();
+            return;
+        }
+
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationListener locationListener = new LocationListener() {
             @Override
@@ -60,9 +89,11 @@ public class GlobalWeather extends AppCompatActivity {
                 weatherHelper.loadWeatherData(latitude, longitude);
                 // Здесь можно прекратить запросы на местоположение, если нужно
                 locationManager.removeUpdates(this);
+                // Обновление экрана с данными о погоде
             }
         };
-        // Проверка разрешений перед запросом на обновление местоположения
+
+        // Добавляем проверку разрешений перед запросом на обновление местоположения
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // Использование GPS_PROVIDER
@@ -74,6 +105,21 @@ public class GlobalWeather extends AppCompatActivity {
             Toast.makeText(this, "Приложению необходим доступ к местоположению для работы", Toast.LENGTH_SHORT).show();
         }
     }
+
+    // Показать диалоговое окно с просьбой включить GPS и интернет
+    private void showEnableLocationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Включите GPS и интернет")
+                .setMessage("Для работы приложения необходимо включить GPS и подключиться к интернету.")
+                .setPositiveButton("Настройки", (dialog, which) -> {
+                    // Переход к настройкам устройства для включения GPS и интернета
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Отмена", (dialog, which) -> finish()) // Закрыть приложение при отмене
+                .show();
+    }
+
     // Обработка результатов запроса разрешений
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -83,23 +129,102 @@ public class GlobalWeather extends AppCompatActivity {
                 // Разрешение предоставлено, получаем местоположение
                 getLocation();
             } else {
-                // Разрешение не предоставлено, вывести сообщение пользователю
-                Toast.makeText(this, "Приложению необходим доступ к местоположению для работы", Toast.LENGTH_SHORT).show();
+                // Разрешение не предоставлено, проверяем, стоит ли показать объяснение
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    // Пользователь отказал в разрешении, но разрешения не были запрещены навсегда
+                    // Здесь можно показать объяснение, почему разрешение необходимо для работы приложения
+                    showPermissionExplanationDialog();
+                } else {
+                    // Пользователь отказал в разрешении и выбрал "Не спрашивать снова"
+                    // Здесь можно показать сообщение о том, что разрешение не было предоставлено
+                    Toast.makeText(this, "Приложению необходим доступ к местоположению для работы", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
+
+    private BroadcastReceiver gpsSwitchStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (LocationManager.PROVIDERS_CHANGED_ACTION.equals(intent.getAction())) {
+                // Проверка включенности GPS после изменения состояния
+                if (isGPSEnabled()) {
+                    // Если GPS включен, обновить местоположение
+                    getLocation();
+                } else {
+                    // Если GPS отключен, показать пользователю сообщение
+                    showEnableLocationDialog();
+                }
+            }
+        }
+    };
+
+    private BroadcastReceiver networkChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())) {
+                // Проверка подключения к интернету после изменения состояния
+                if (isInternetConnected()) {
+                    // Если интернет подключен, обновить местоположение
+                    getLocation();
+                } else {
+                    // Если интернет отключен, показать пользователю сообщение
+                    showEnableInternetDialog();
+                }
+            }
+        }
+    };
+
+    // Отображение диалога о включении интернета
+    private void showEnableInternetDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Подключение к интернету отсутствует")
+                .setMessage("Для работы приложения необходимо подключение к интернету.")
+                .setPositiveButton("Настройки", (dialog, which) -> {
+                    Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Отмена", (dialog, which) -> finish())
+                .show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Регистрация приемников для отслеживания изменений состояния GPS и интернета
+        registerReceiver(gpsSwitchStateReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
+        registerReceiver(networkChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Отмена регистрации приемников при приостановке активности
+        unregisterReceiver(gpsSwitchStateReceiver);
+        unregisterReceiver(networkChangeReceiver);
+    }
+
+    // Показать объяснение необходимости разрешения
+    private void showPermissionExplanationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Разрешение на местоположение")
+                .setMessage("Для работы приложения необходим доступ к местоположению.")
+                .setPositiveButton("Предоставить разрешение", (dialog, which) -> {
+                    // Повторный запрос разрешения после объяснения
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                })
+                .setNegativeButton("Отмена", (dialog, which) -> finish()) // Закрыть приложение при отмене
+                .show();
+    }
+
     // Метод для обновления TextView с данными о местоположении
     public void updateLocationTextView(String location) {
         locationTextView.setText(location);
-
-        Log.d("WeatherData", "Местоположение: " + location);
     }
     // Метод для обновления TextView с данными о температуре
     public void updateTemperatureTextView(double temperature) {
         String temperatureString = String.format(Locale.getDefault(), "%.0f°С", temperature);
         temperatureTextView.setText(temperatureString);
-
-        Log.d("WeatherData", "Температура: " + temperatureString);
     }
     // Метод для обновления TextView с данными о влажности
     public void updateHumidityTextView(double humidity) {
@@ -138,6 +263,55 @@ public class GlobalWeather extends AppCompatActivity {
         TextView pressureTextView = findViewById(R.id.pressureValue);
         pressureTextView.setText(String.format("%.1f мм рт. ст.", pressureInMmHg));
     }
+
+    // Метод для обновления TextView с данными о видимости
+    public void updateVisibilityTextView(int visibility) {
+        TextView visibilityTextView = findViewById(R.id.visibilityValue);
+        visibilityTextView.setText(String.format(Locale.getDefault(), "%d м", visibility));
+    }
+
+    // Метод для обновления TextView с данными о осадках (дождь)
+    public void updateRainTextView(double rainVolume) {
+        TextView rainTextView = findViewById(R.id.rainValue);
+        if (rainVolume > 0) {
+            rainTextView.setText(String.format(Locale.getDefault(), "Дождь: %.2f мм", rainVolume));
+        } else {
+            rainTextView.setText("Без осадков");
+        }
+    }
+
+    // Метод для обновления TextView с данными о осадках (снег)
+    public void updateSnowTextView(double snowVolume) {
+        TextView snowTextView = findViewById(R.id.snowValue);
+        if (snowVolume > 0) {
+            snowTextView.setText(String.format(Locale.getDefault(), "Снег: %.2f мм", snowVolume));
+        } else {
+            snowTextView.setText("Без осадков");
+        }
+    }
+    // Метод для обновления TextView с данными о восходе/закате
+    public void updateSunriseSunsetTextView(long sunrise, long sunset) {
+        TextView sunriseSunsetTextView = findViewById(R.id.sunriseSunsetValue);
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        String sunriseString = sdf.format(new Date(sunrise * 1000));
+        String sunsetString = sdf.format(new Date(sunset * 1000));
+        sunriseSunsetTextView.setText("В: " + sunriseString + " З: " + sunsetString);
+    }
+
+    // Метод для обновления TextView с данными о облачности
+    public void updateCloudinessTextView(int cloudinessPercentage) {
+        TextView cloudinessTextView = findViewById(R.id.cloudinessValue);
+        if (cloudinessPercentage == 0) {
+            cloudinessTextView.setText("Ясно");
+        } else if (cloudinessPercentage < 20) {
+            cloudinessTextView.setText("Малооблачно");
+        } else if (cloudinessPercentage < 70) {
+            cloudinessTextView.setText("Перем. облачность");
+        } else {
+            cloudinessTextView.setText("Пасмурно");
+        }
+    }
+
     // Метод для обновления TextView с данными о долготе
     public void updateLongitudeTextView(double longitude) {
         // Обновление TextView с данными о долготе
@@ -204,8 +378,35 @@ public class GlobalWeather extends AppCompatActivity {
                             double pressure = weatherResponse.getMainWeatherInfo().getPressure();
                             double latitude = weatherResponse.getCoordinates().getLatitude();
                             double longitude = weatherResponse.getCoordinates().getLongitude();
+
+                            long sunrise = weatherResponse.getSystemInfo().getSunrise();
+                            long sunset = weatherResponse.getSystemInfo().getSunset();
+
+                            int visibility = weatherResponse.getVisibility();
+                            double rainVolume = checkRain(weatherResponse);
+                            double snowVolume = checkSnow(weatherResponse);
+                            int cloudinessPercentage = calculateCloudinessPercentage(weatherResponse);
+
                             long endTime = System.currentTimeMillis();
                             long elapsedTime = endTime - currentTime;
+
+                            Log.d("WeatherData", "Город: " + city);
+                            Log.d("WeatherData", "Температура: " + temperature);
+                            Log.d("WeatherData", "Влажность: " + humidity);
+                            Log.d("WeatherData", "Ощущается как: " + feelsLikeTemperature);
+                            Log.d("WeatherData", "Максимальная температура: " + maxTemperature);
+                            Log.d("WeatherData", "Минимальная температура: " + minTemperature);
+                            Log.d("WeatherData", "Скорость ветра: " + windSpeed);
+                            Log.d("WeatherData", "Направление ветра: " + windDirection);
+                            Log.d("WeatherData", "Давление: " + pressure);
+                            Log.d("WeatherData", "Широта: " + latitude);
+                            Log.d("WeatherData", "Долгота: " + longitude);
+                            Log.d("WeatherData", "Видимость: " + visibility);
+                            Log.d("WeatherData", "Дождь: " + rainVolume + " мм");
+                            Log.d("WeatherData", "Снег: " + snowVolume + " мм");
+                            Log.d("WeatherData", "Облачность: " + cloudinessPercentage + "%");
+                            Log.d("WeatherData", "Восход солнца: " + sunrise);
+                            Log.d("WeatherData", "Закат солнца: " + sunset);
                             Log.d("WeatherData", "Получены данные для " + city + " за " + elapsedTime + " мс");
 
                             updateLocationTextView(city);
@@ -218,8 +419,15 @@ public class GlobalWeather extends AppCompatActivity {
                             updatePressureTextView(pressure);
                             updateLatitudeTextView(latitude);
                             updateLongitudeTextView(longitude);
+                            updateVisibilityTextView(visibility);
+                            updateRainTextView(rainVolume);
+                            updateSnowTextView(snowVolume);
+                            updateCloudinessTextView(cloudinessPercentage);
+                            updateSunriseSunsetTextView(sunrise, sunset);
+
                             lastRequestTime = System.currentTimeMillis();
                             requestCount++;
+
                         }
                     }
                     @Override
@@ -231,5 +439,35 @@ public class GlobalWeather extends AppCompatActivity {
                 Toast.makeText(GlobalWeather.this, "Достигнуто максимальное количество запросов к API за час. Попробуйте через час =)", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+    // Обновление методов проверки осадков и облачности
+    private double checkRain(WeatherResponse weatherResponse) {
+        double totalRainVolume = 0.0;
+        WeatherResponse.WeatherDetails[] weatherDetails = weatherResponse.getWeatherDetails();
+        for (WeatherResponse.WeatherDetails details : weatherDetails) {
+            if (details.getWeatherMain().equals("Rain")) {
+                totalRainVolume += details.getRainVolume();
+            }
+        }
+        return totalRainVolume;
+    }
+
+    private double checkSnow(WeatherResponse weatherResponse) {
+        double totalSnowVolume = 0.0;
+        WeatherResponse.WeatherDetails[] weatherDetails = weatherResponse.getWeatherDetails();
+        for (WeatherResponse.WeatherDetails details : weatherDetails) {
+            if (details.getWeatherMain().equals("Snow")) {
+                totalSnowVolume += details.getSnowVolume();
+            }
+        }
+        return totalSnowVolume;
+    }
+
+    private int calculateCloudinessPercentage(WeatherResponse weatherResponse) {
+        WeatherResponse.Clouds clouds = weatherResponse.getClouds();
+        if (clouds != null) {
+            return clouds.getCloudiness();
+        }
+        return 0;
     }
 }
