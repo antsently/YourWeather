@@ -30,60 +30,80 @@ public class WeatherResponse {
     public Coordinates getCoordinates() {
         return coordinates;
     }
-}
 
-class MainWeatherInfo {
-    @SerializedName("temp")
-    private double temperature;
+    static class MainWeatherInfo {
+        @SerializedName("temp")
+        private double temperature;
 
-    @SerializedName("pressure")
-    private double pressure;
+        @SerializedName("feels_like")
+        private double feelsLikeTemperature; // Температура по ощущениям
 
-    public double getTemperature() {
-        return temperature;
+        @SerializedName("pressure")
+        private double pressure;
+
+        @SerializedName("humidity")
+        private double humidity;
+
+        @SerializedName("temp_min")
+        private double minTemperature;
+
+        @SerializedName("temp_max")
+        private double maxTemperature;
+
+        public double getTemperature() {
+            return temperature;
+        }
+
+        public double getFeelsLikeTemperature() {
+            return feelsLikeTemperature;
+        }
+
+        public double getPressure() {
+            return pressure;
+        }
+
+        public double getHumidity() {
+            return humidity;
+        }
+
+        public double getMinTemperature() {
+            return minTemperature;
+        }
+
+        public double getMaxTemperature() {
+            return maxTemperature;
+        }
     }
 
-    public double getPressure() {
-        return pressure;
-    }
-}
-class WeatherMainInfo {
-    @SerializedName("temp")
-    private double temperature;
+    static class WindInfo {
+        @SerializedName("speed")
+        private double speed;
 
-    public double getTemperature() {
-        return temperature;
-    }
-}
+        @SerializedName("deg")
+        private double direction;
 
-class WindInfo {
-    @SerializedName("speed")
-    private double speed;
+        public double getSpeed() {
+            return speed;
+        }
 
-    @SerializedName("deg")
-    private double direction; // Добавим направление ветра
-
-    public double getSpeed() {
-        return speed;
+        public double getDirection() {
+            return direction;
+        }
     }
 
-    public double getDirection() {
-        return direction;
-    }
-}
+    static class Coordinates {
+        @SerializedName("lat")
+        private double latitude;
 
-class Coordinates {
-    @SerializedName("lat")
-    private double latitude;
+        @SerializedName("lon")
+        private double longitude;
 
-    @SerializedName("lon")
-    private double longitude;
+        public double getLatitude() {
+            return latitude;
+        }
 
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
+        public double getLongitude() {
+            return longitude;
+        }
     }
 }

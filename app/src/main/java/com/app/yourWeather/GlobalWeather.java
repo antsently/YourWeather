@@ -7,7 +7,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.Manifest;
 import android.widget.Toast;
@@ -25,16 +24,12 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GlobalWeather extends AppCompatActivity {
-
-
     private static final String BASE_URL = "https://api.openweathermap.org/data/2.5/";
     private static final String UNITS_METRIC = "metric";
     private static final String UNITS_LANG = "ru";
     private static final String API_KEY = "064b58d59c738d8cff7324094ae5e0cd";
-
     private TextView locationTextView;
     private TextView temperatureTextView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +37,6 @@ public class GlobalWeather extends AppCompatActivity {
 
         locationTextView = findViewById(R.id.location);
         temperatureTextView = findViewById(R.id.temperature);
-
         // Проверка разрешений на местоположение
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -53,7 +47,6 @@ public class GlobalWeather extends AppCompatActivity {
             getLocation();
         }
     }
-
     // Получение данных о местоположении
     private void getLocation() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -62,23 +55,18 @@ public class GlobalWeather extends AppCompatActivity {
             public void onLocationChanged(Location location) {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-
                 // Вызов метода для загрузки погоды с использованием полученных координат
                 WeatherHelper weatherHelper = new WeatherHelper();
                 weatherHelper.loadWeatherData(latitude, longitude);
-
                 // Здесь можно прекратить запросы на местоположение, если нужно
                 locationManager.removeUpdates(this);
             }
         };
-
         // Проверка разрешений перед запросом на обновление местоположения
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
             // Использование GPS_PROVIDER
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, locationListener);
-
             // Добавление NETWORK_PROVIDER
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 10, locationListener);
         } else {
@@ -86,7 +74,6 @@ public class GlobalWeather extends AppCompatActivity {
             Toast.makeText(this, "Приложению необходим доступ к местоположению для работы", Toast.LENGTH_SHORT).show();
         }
     }
-
     // Обработка результатов запроса разрешений
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -101,14 +88,12 @@ public class GlobalWeather extends AppCompatActivity {
             }
         }
     }
-
     // Метод для обновления TextView с данными о местоположении
     public void updateLocationTextView(String location) {
         locationTextView.setText(location);
 
         Log.d("WeatherData", "Местоположение: " + location);
     }
-
     // Метод для обновления TextView с данными о температуре
     public void updateTemperatureTextView(double temperature) {
         String temperatureString = String.format(Locale.getDefault(), "%.0f°С", temperature);
@@ -116,7 +101,29 @@ public class GlobalWeather extends AppCompatActivity {
 
         Log.d("WeatherData", "Температура: " + temperatureString);
     }
+    // Метод для обновления TextView с данными о влажности
+    public void updateHumidityTextView(double humidity) {
+        TextView humidityTextView = findViewById(R.id.humidityValue);
+        humidityTextView.setText(String.format(Locale.getDefault(), "%.1f%%", humidity));
+    }
 
+    // Метод для обновления TextView с данными о температуре по ощущениям
+    public void updateFeelsLikeTemperatureTextView(double feelsLikeTemperature) {
+        TextView feelsLikeTemperatureTextView = findViewById(R.id.feelsLikeTemperatureValue);
+        feelsLikeTemperatureTextView.setText(String.format(Locale.getDefault(), "%.0f°С", feelsLikeTemperature));
+    }
+
+    // Метод для обновления TextView с данными о максимальной температуре
+    public void updateMaxTemperatureTextView(double maxTemperature) {
+        TextView maxTemperatureTextView = findViewById(R.id.maxTemperatureValue);
+        maxTemperatureTextView.setText(String.format(Locale.getDefault(), "%.0f°С", maxTemperature));
+    }
+
+    // Метод для обновления TextView с данными о минимальной температуре
+    public void updateMinTemperatureTextView(double minTemperature) {
+        TextView minTemperatureTextView = findViewById(R.id.minTemperatureValue);
+        minTemperatureTextView.setText(String.format(Locale.getDefault(), "%.0f°С", minTemperature));
+    }
     // Метод для обновления TextView с данными о ветре и направлении
     public void updateWindTextView(double windSpeed, double windDirection) {
         String direction = getWindDirection(windDirection);
@@ -125,29 +132,24 @@ public class GlobalWeather extends AppCompatActivity {
         TextView windTextView = findViewById(R.id.windValue);
         windTextView.setText(windInfo);
     }
-
-
     // Метод для обновления TextView с данными о давлении
     public void updatePressureTextView(double pressure) {
         double pressureInMmHg = pressure * 0.75006375541921;
         TextView pressureTextView = findViewById(R.id.pressureValue);
         pressureTextView.setText(String.format("%.1f мм рт. ст.", pressureInMmHg));
     }
-
     // Метод для обновления TextView с данными о долготе
     public void updateLongitudeTextView(double longitude) {
         // Обновление TextView с данными о долготе
         TextView longitudeTextView = findViewById(R.id.longitude);
         longitudeTextView.setText(String.valueOf(longitude));
     }
-
     // Метод для обновления TextView с данными о широте
     public void updateLatitudeTextView(double latitude) {
         // Обновление TextView с данными о широте
         TextView latitudeTextView = findViewById(R.id.latitude);
         latitudeTextView.setText(String.valueOf(latitude));
     }
-
     public String getWindDirection(double degree) {
         if (degree >= 337.5 || degree < 22.5) {
             return "Северный";
@@ -167,21 +169,18 @@ public class GlobalWeather extends AppCompatActivity {
             return "Северо-западный";
         }
     }
-
     // Класс для загрузки данных о погоде
     private class WeatherHelper {
         private long lastRequestTime = 0;
         private int requestCount = 0;
-
         public void loadWeatherData(double latitude, double longitude) {
             long currentTime = System.currentTimeMillis();
             long elapsedTimeSinceLastRequest = currentTime - lastRequestTime;
-            if (elapsedTimeSinceLastRequest >= 3600000) { // Проверка прошедшего времени (1 час = 3600000 мс)
-                // Если прошло более 1 часа с последнего запроса, сбрасываем счетчик запросов
+            if (elapsedTimeSinceLastRequest >= 3600000) {
                 requestCount = 0;
             }
 
-            if (requestCount < 3) { // Проверка количества запросов
+            if (requestCount < 3) {
                 Retrofit retrofit = new Retrofit.Builder()
                         .baseUrl(BASE_URL)
                         .addConverterFactory(GsonConverterFactory.create())
@@ -196,6 +195,10 @@ public class GlobalWeather extends AppCompatActivity {
                             WeatherResponse weatherResponse = response.body();
                             String city = weatherResponse.getCityName();
                             double temperature = weatherResponse.getMainWeatherInfo().getTemperature();
+                            double humidity = weatherResponse.getMainWeatherInfo().getHumidity();
+                            double feelsLikeTemperature = weatherResponse.getMainWeatherInfo().getFeelsLikeTemperature();
+                            double maxTemperature = weatherResponse.getMainWeatherInfo().getMaxTemperature();
+                            double minTemperature = weatherResponse.getMainWeatherInfo().getMinTemperature();
                             double windSpeed = weatherResponse.getWindInfo().getSpeed();
                             double windDirection = weatherResponse.getWindInfo().getDirection();
                             double pressure = weatherResponse.getMainWeatherInfo().getPressure();
@@ -204,29 +207,29 @@ public class GlobalWeather extends AppCompatActivity {
                             long endTime = System.currentTimeMillis();
                             long elapsedTime = endTime - currentTime;
                             Log.d("WeatherData", "Получены данные для " + city + " за " + elapsedTime + " мс");
+
                             updateLocationTextView(city);
                             updateTemperatureTextView(temperature);
+                            updateHumidityTextView(humidity);
+                            updateFeelsLikeTemperatureTextView(feelsLikeTemperature);
+                            updateMaxTemperatureTextView(maxTemperature);
+                            updateMinTemperatureTextView(minTemperature);
                             updateWindTextView(windSpeed, windDirection);
                             updatePressureTextView(pressure);
                             updateLatitudeTextView(latitude);
                             updateLongitudeTextView(longitude);
-
-                            // Обновляем время последнего запроса и увеличиваем счетчик запросов
                             lastRequestTime = System.currentTimeMillis();
                             requestCount++;
                         }
                     }
-
                     @Override
                     public void onFailure(Call<WeatherResponse> call, Throwable t) {
                         Log.e("WeatherData", "Ошибка получения данных о погоде: " + t.getMessage());
                     }
                 });
             } else {
-                // Если достигнуто максимальное количество запросов, выведите сообщение пользователю
                 Toast.makeText(GlobalWeather.this, "Достигнуто максимальное количество запросов к API за час. Попробуйте через час =)", Toast.LENGTH_SHORT).show();
             }
         }
     }
-
 }
