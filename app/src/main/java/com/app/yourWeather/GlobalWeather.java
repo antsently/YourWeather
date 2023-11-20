@@ -13,6 +13,8 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.Manifest;
 import android.widget.Toast;
@@ -21,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.widget.NestedScrollView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -326,21 +329,21 @@ public class GlobalWeather extends AppCompatActivity {
     }
     public String getWindDirection(double degree) {
         if (degree >= 337.5 || degree < 22.5) {
-            return "Северный";
+            return "С";
         } else if (degree >= 22.5 && degree < 67.5) {
-            return "Северо-восточный";
+            return "С-В";
         } else if (degree >= 67.5 && degree < 112.5) {
-            return "Восточный";
+            return "В";
         } else if (degree >= 112.5 && degree < 157.5) {
-            return "Юго-восточный";
+            return "Ю-В";
         } else if (degree >= 157.5 && degree < 202.5) {
-            return "Южный";
+            return "Ю";
         } else if (degree >= 202.5 && degree < 247.5) {
-            return "Юго-западный";
+            return "Ю-З";
         } else if (degree >= 247.5 && degree < 292.5) {
-            return "Западный";
+            return "З";
         } else {
-            return "Северо-западный";
+            return "С-В";
         }
     }
     // Класс для загрузки данных о погоде
@@ -442,25 +445,17 @@ public class GlobalWeather extends AppCompatActivity {
     }
     // Обновление методов проверки осадков и облачности
     private double checkRain(WeatherResponse weatherResponse) {
-        double totalRainVolume = 0.0;
-        WeatherResponse.WeatherDetails[] weatherDetails = weatherResponse.getWeatherDetails();
-        for (WeatherResponse.WeatherDetails details : weatherDetails) {
-            if (details.getWeatherMain().equals("Rain")) {
-                totalRainVolume += details.getRainVolume();
-            }
+        if (weatherResponse.getRainInfo() != null) {
+            return weatherResponse.getRainInfo().getRainVolume();
         }
-        return totalRainVolume;
+        return 0.0;
     }
 
     private double checkSnow(WeatherResponse weatherResponse) {
-        double totalSnowVolume = 0.0;
-        WeatherResponse.WeatherDetails[] weatherDetails = weatherResponse.getWeatherDetails();
-        for (WeatherResponse.WeatherDetails details : weatherDetails) {
-            if (details.getWeatherMain().equals("Snow")) {
-                totalSnowVolume += details.getSnowVolume();
-            }
+        if (weatherResponse.getSnowInfo() != null) {
+            return weatherResponse.getSnowInfo().getSnowVolume();
         }
-        return totalSnowVolume;
+        return 0.0;
     }
 
     private int calculateCloudinessPercentage(WeatherResponse weatherResponse) {

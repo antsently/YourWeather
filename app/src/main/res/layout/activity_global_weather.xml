@@ -1,60 +1,56 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/todayWeatherCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        app:cardBackgroundColor="@color/round"
+        android:layout_margin="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="vertical"
-            android:background="@drawable/rounded_background"
             android:padding="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/location"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="нет данных"
-                android:textAlignment="center"
-                android:textColor="@android:color/white"
-                android:textSize="44sp" />
-        </LinearLayout>
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="нет данных"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="38sp" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/temperature"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="нет данных"
-                android:textAlignment="center"
-                android:textColor="@android:color/white"
-                android:textSize="28sp" />
-        </LinearLayout>
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/temperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="нет данных"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="28sp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -130,8 +126,7 @@
                         android:text="По ощущениям: "
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
-                        android:layout_gravity="center_vertical"
-                        />
+                        android:layout_gravity="center_vertical" />
 
                     <TextView
                         android:id="@+id/feelsLikeTemperatureValue"
@@ -142,76 +137,34 @@
                         android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
-
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/forecastCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@id/todayWeatherCard"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rounded_background"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/weatherType"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Информация"
-                android:textAlignment="center"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-            </LinearLayout>
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
-    <LinearLayout
-        android:id="@+id/firstHorizontalLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+    <GridLayout
+        android:id="@+id/gridLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:columnCount="2"
+        android:rowCount="4"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/forecastCard"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp">
+        android:layout_margin="0dp">
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/firstCardView"
+            android:id="@+id/card1"
             android:layout_width="0dp"
+            app:cardBackgroundColor="@color/round"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="5dp">
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_margin="5dp">
+            <!-- Содержимое карточки -->
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="@drawable/rounded_background"
                 android:padding="16dp">
 
                 <LinearLayout
@@ -229,72 +182,48 @@
                         android:layout_gravity="center_vertical" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Ветер"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         android:layout_gravity="center_vertical" />
-
                 </LinearLayout>
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/windValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:text="нет данных"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
-
                 </LinearLayout>
-
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Карточка 2 -->
         <androidx.cardview.widget.CardView
-            android:id="@+id/secondCardView"
+            android:id="@+id/card2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="5dp">
+            android:layout_columnWeight="1"
+            app:cardBackgroundColor="@color/round"
+            android:layout_rowWeight="1"
+            android:layout_margin="5dp">
+            <!-- Содержимое карточки -->
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="@drawable/rounded_background"
                 android:padding="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="2dp"
-                    android:src="@drawable/humidity"
-                    android:layout_gravity="center_vertical"
-                    android:contentDescription="Влажность" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Влажность"
-                    android:layout_gravity="center_vertical"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp"/>
-
-            </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -302,44 +231,56 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="2dp"
+                        android:src="@drawable/humidity"
+                        android:contentDescription="Влажность"
+                        android:layout_gravity="center_vertical" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Влажность"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp"
+                        android:layout_gravity="center_vertical" />
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
                     <TextView
                         android:id="@+id/humidityValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:text="нет данных"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
-    </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/firstHorizontalLayout2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/firstHorizontalLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp">
-
+        <!-- Карточка 3 -->
         <androidx.cardview.widget.CardView
-            android:id="@+id/firstCardView2"
+            android:id="@+id/card3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="5dp">
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardBackgroundColor="@color/round"
+            android:layout_margin="5dp">
+            <!-- Содержимое карточки -->
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="@drawable/rounded_background"
                 android:padding="16dp">
 
                 <LinearLayout
@@ -357,47 +298,47 @@
                         android:layout_gravity="center_vertical" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Давление"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         android:layout_gravity="center_vertical" />
-
                 </LinearLayout>
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/pressureValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:text="нет данных"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
-
                 </LinearLayout>
-
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Карточка 4 -->
         <androidx.cardview.widget.CardView
-            android:id="@+id/secondCardView2"
+            android:id="@+id/card4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="5dp">
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardBackgroundColor="@color/round"
+            android:layout_margin="5dp">
+            <!-- Содержимое карточки -->
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="@drawable/rounded_background"
                 android:padding="16dp">
 
                 <LinearLayout
@@ -411,63 +352,52 @@
                         android:layout_height="24dp"
                         android:layout_marginEnd="2dp"
                         android:src="@drawable/visibility"
-                        android:layout_gravity="center_vertical"
-                        android:contentDescription="Видимость" />
+                        android:contentDescription="Видимость"
+                        android:layout_gravity="center_vertical" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Видимость"
-                        android:layout_gravity="center_vertical"
                         android:textColor="@android:color/white"
-                        android:textSize="16sp"/>
-
+                        android:textSize="16sp"
+                        android:layout_gravity="center_vertical" />
                 </LinearLayout>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/visibilityValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:text="нет данных"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
-    </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/firstHorizontalLayout3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/firstHorizontalLayout2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp">
-
+        <!-- Второй ряд -->
+        <!-- Карточка 5 -->
         <androidx.cardview.widget.CardView
-            android:id="@+id/firstCardView3"
+            android:id="@+id/card5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="5dp">
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardBackgroundColor="@color/round"
+            android:layout_margin="5dp">
+            <!-- Содержимое карточки -->
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="@drawable/rounded_background"
                 android:padding="16dp">
 
                 <LinearLayout
@@ -485,47 +415,48 @@
                         android:layout_gravity="center_vertical" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Дождь (осадки)"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         android:layout_gravity="center_vertical" />
-
                 </LinearLayout>
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/rainValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:text="нет данных"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
-
                 </LinearLayout>
-
             </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
+        <!-- Карточка 6 -->
         <androidx.cardview.widget.CardView
-            android:id="@+id/secondCardView3"
+            android:id="@+id/card6"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="5dp">
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardBackgroundColor="@color/round"
+            android:layout_margin="5dp">
+            <!-- Содержимое карточки -->
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="@drawable/rounded_background"
                 android:padding="16dp">
 
                 <LinearLayout
@@ -539,63 +470,51 @@
                         android:layout_height="24dp"
                         android:layout_marginEnd="2dp"
                         android:src="@drawable/snow"
-                        android:layout_gravity="center_vertical"
-                        android:contentDescription="Снег" />
+                        android:contentDescription="Снег"
+                        android:layout_gravity="center_vertical" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Снег (осадки)"
-                        android:layout_gravity="center_vertical"
                         android:textColor="@android:color/white"
-                        android:textSize="16sp"/>
-
+                        android:textSize="16sp"
+                        android:layout_gravity="center_vertical" />
                 </LinearLayout>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/snowValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:text="нет данных"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
-    </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/firstHorizontalLayout4"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/firstHorizontalLayout3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp">
-
+        <!-- Карточка 7 -->
         <androidx.cardview.widget.CardView
-            android:id="@+id/firstCardView4"
+            android:id="@+id/card7"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="5dp">
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardBackgroundColor="@color/round"
+            android:layout_margin="5dp">
+            <!-- Содержимое карточки -->
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="@drawable/rounded_background"
                 android:padding="16dp">
 
                 <LinearLayout
@@ -609,51 +528,51 @@
                         android:layout_height="24dp"
                         android:layout_marginEnd="2dp"
                         android:src="@drawable/routine"
-                        android:contentDescription="Возвод/Закат"
+                        android:contentDescription="Солнце"
                         android:layout_gravity="center_vertical" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Солнце"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         android:layout_gravity="center_vertical" />
-
                 </LinearLayout>
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/sunriseSunsetValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:text="нет данных"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
-
                 </LinearLayout>
-
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <!-- Карточка 8 -->
         <androidx.cardview.widget.CardView
-            android:id="@+id/secondCardView4"
+            android:id="@+id/card8"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="5dp">
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            app:cardBackgroundColor="@color/round"
+            android:layout_margin="5dp">
+            <!-- Содержимое карточки -->
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="@drawable/rounded_background"
                 android:padding="16dp">
 
                 <LinearLayout
@@ -667,52 +586,48 @@
                         android:layout_height="24dp"
                         android:layout_marginEnd="2dp"
                         android:src="@drawable/cloudiness"
-                        android:layout_gravity="center_vertical"
-                        android:contentDescription="Облачность" />
+                        android:contentDescription="Облачность"
+                        android:layout_gravity="center_vertical" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Облачность"
-                        android:layout_gravity="center_vertical"
                         android:textColor="@android:color/white"
-                        android:textSize="16sp"/>
-
+                        android:textSize="16sp"
+                        android:layout_gravity="center_vertical" />
                 </LinearLayout>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/cloudinessValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:text="нет данных"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
-    </LinearLayout>
+    </GridLayout>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/forecastCardBottom"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@id/firstHorizontalLayout4"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:layout_width="match_parent"
+        app:cardBackgroundColor="@color/round"
+        android:layout_height="100dp"
+        android:layout_margin="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rounded_background"
+            android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -750,7 +665,6 @@
                     android:textAlignment="center"
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -779,6 +693,4 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
