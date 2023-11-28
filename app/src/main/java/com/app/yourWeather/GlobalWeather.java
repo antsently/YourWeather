@@ -430,7 +430,6 @@ public class GlobalWeather extends AppCompatActivity {
 
                             lastRequestTime = System.currentTimeMillis();
                             requestCount++;
-
                         }
                     }
                     @Override
