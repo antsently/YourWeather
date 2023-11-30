@@ -10,11 +10,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.Manifest;
 import android.widget.Toast;
@@ -23,7 +25,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.widget.NestedScrollView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,16 +43,25 @@ public class GlobalWeather extends AppCompatActivity {
     private static final String API_KEY = "064b58d59c738d8cff7324094ae5e0cd";
     private TextView locationTextView;
     private TextView temperatureTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_global_weather);
 
+        Window w = getWindow();
+        w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            WindowManager.LayoutParams params = getWindow().getAttributes();
+            params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            getWindow().setAttributes(params);
+        }
+
         locationTextView = findViewById(R.id.location);
         temperatureTextView = findViewById(R.id.temperature);
         // Проверка разрешений на местоположение
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Запрос разрешений, если они не были предоставлены
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
@@ -80,7 +90,6 @@ public class GlobalWeather extends AppCompatActivity {
             showEnableLocationDialog();
             return;
         }
-
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationListener locationListener = new LocationListener() {
             @Override
@@ -95,10 +104,8 @@ public class GlobalWeather extends AppCompatActivity {
                 // Обновление экрана с данными о погоде
             }
         };
-
         // Добавляем проверку разрешений перед запросом на обновление местоположения
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // Использование GPS_PROVIDER
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, locationListener);
             // Добавление NETWORK_PROVIDER
@@ -112,14 +119,11 @@ public class GlobalWeather extends AppCompatActivity {
     // Показать диалоговое окно с просьбой включить GPS и интернет
     private void showEnableLocationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Включите GPS и интернет")
-                .setMessage("Для работы приложения необходимо включить GPS и подключиться к интернету.")
-                .setPositiveButton("Настройки", (dialog, which) -> {
+        builder.setTitle("Включите GPS и Интернет").setMessage("Для работы приложения необходимо включить GPS и подключиться к интернету.").setPositiveButton("Настройки", (dialog, which) -> {
                     // Переход к настройкам устройства для включения GPS и интернета
                     Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                     startActivity(intent);
-                })
-                .setNegativeButton("Отмена", (dialog, which) -> finish()) // Закрыть приложение при отмене
+                }).setNegativeButton("Отмена", (dialog, which) -> finish()) // Закрыть приложение при отмене
                 .show();
     }
 
@@ -181,14 +185,10 @@ public class GlobalWeather extends AppCompatActivity {
     // Отображение диалога о включении интернета
     private void showEnableInternetDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Подключение к интернету отсутствует")
-                .setMessage("Для работы приложения необходимо подключение к интернету.")
-                .setPositiveButton("Настройки", (dialog, which) -> {
-                    Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
-                    startActivity(intent);
-                })
-                .setNegativeButton("Отмена", (dialog, which) -> finish())
-                .show();
+        builder.setTitle("Подключение к интернету отсутствует").setMessage("Для работы приложения необходимо подключение к интернету.").setPositiveButton("Настройки", (dialog, which) -> {
+            Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+            startActivity(intent);
+        }).setNegativeButton("Отмена", (dialog, which) -> finish()).show();
     }
 
     @Override
@@ -210,13 +210,10 @@ public class GlobalWeather extends AppCompatActivity {
     // Показать объяснение необходимости разрешения
     private void showPermissionExplanationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Разрешение на местоположение")
-                .setMessage("Для работы приложения необходим доступ к местоположению.")
-                .setPositiveButton("Предоставить разрешение", (dialog, which) -> {
+        builder.setTitle("Разрешение на местоположение").setMessage("Для работы приложения необходим доступ к местоположению.").setPositiveButton("Предоставить разрешение", (dialog, which) -> {
                     // Повторный запрос разрешения после объяснения
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                })
-                .setNegativeButton("Отмена", (dialog, which) -> finish()) // Закрыть приложение при отмене
+                }).setNegativeButton("Отмена", (dialog, which) -> finish()) // Закрыть приложение при отмене
                 .show();
     }
 
@@ -224,11 +221,13 @@ public class GlobalWeather extends AppCompatActivity {
     public void updateLocationTextView(String location) {
         locationTextView.setText(location);
     }
+
     // Метод для обновления TextView с данными о температуре
     public void updateTemperatureTextView(double temperature) {
         String temperatureString = String.format(Locale.getDefault(), "%.0f°С", temperature);
         temperatureTextView.setText(temperatureString);
     }
+
     // Метод для обновления TextView с данными о влажности
     public void updateHumidityTextView(double humidity) {
         TextView humidityTextView = findViewById(R.id.humidityValue);
@@ -252,6 +251,7 @@ public class GlobalWeather extends AppCompatActivity {
         TextView minTemperatureTextView = findViewById(R.id.minTemperatureValue);
         minTemperatureTextView.setText(String.format(Locale.getDefault(), "%.0f°С", minTemperature));
     }
+
     // Метод для обновления TextView с данными о ветре и направлении
     public void updateWindTextView(double windSpeed, double windDirection) {
         String direction = getWindDirection(windDirection);
@@ -260,11 +260,12 @@ public class GlobalWeather extends AppCompatActivity {
         TextView windTextView = findViewById(R.id.windValue);
         windTextView.setText(windInfo);
     }
+
     // Метод для обновления TextView с данными о давлении
     public void updatePressureTextView(double pressure) {
         double pressureInMmHg = pressure * 0.75006375541921;
         TextView pressureTextView = findViewById(R.id.pressureValue);
-        pressureTextView.setText(String.format("%.1f мм рт. ст.", pressureInMmHg));
+        pressureTextView.setText(String.format(Locale.getDefault(), "%.1f мм рт. ст.", pressureInMmHg));
     }
 
     // Метод для обновления TextView с данными о видимости
@@ -292,13 +293,14 @@ public class GlobalWeather extends AppCompatActivity {
             snowTextView.setText("Без осадков");
         }
     }
+
     // Метод для обновления TextView с данными о восходе/закате
     public void updateSunriseSunsetTextView(long sunrise, long sunset) {
         TextView sunriseSunsetTextView = findViewById(R.id.sunriseSunsetValue);
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
         String sunriseString = sdf.format(new Date(sunrise * 1000));
         String sunsetString = sdf.format(new Date(sunset * 1000));
-        sunriseSunsetTextView.setText("В: " + sunriseString + " З: " + sunsetString);
+        sunriseSunsetTextView.setText(String.format(Locale.getDefault(), "В: " + sunriseString + " З: " + sunsetString));
     }
 
     // Метод для обновления TextView с данными о облачности
@@ -321,12 +323,14 @@ public class GlobalWeather extends AppCompatActivity {
         TextView longitudeTextView = findViewById(R.id.longitude);
         longitudeTextView.setText(String.valueOf(longitude));
     }
+
     // Метод для обновления TextView с данными о широте
     public void updateLatitudeTextView(double latitude) {
         // Обновление TextView с данными о широте
         TextView latitudeTextView = findViewById(R.id.latitude);
         latitudeTextView.setText(String.valueOf(latitude));
     }
+
     public String getWindDirection(double degree) {
         if (degree >= 337.5 || degree < 22.5) {
             return "С";
@@ -346,10 +350,12 @@ public class GlobalWeather extends AppCompatActivity {
             return "С-В";
         }
     }
+
     // Класс для загрузки данных о погоде
     private class WeatherHelper {
         private long lastRequestTime = 0;
         private int requestCount = 0;
+
         public void loadWeatherData(double latitude, double longitude) {
             long currentTime = System.currentTimeMillis();
             long elapsedTimeSinceLastRequest = currentTime - lastRequestTime;
@@ -358,10 +364,7 @@ public class GlobalWeather extends AppCompatActivity {
             }
 
             if (requestCount < 3) {
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl(BASE_URL)
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
+                Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
 
                 WeatherService service = retrofit.create(WeatherService.class);
                 Call<WeatherResponse> call = service.getWeather(latitude, longitude, UNITS_METRIC, UNITS_LANG, API_KEY);
@@ -390,6 +393,27 @@ public class GlobalWeather extends AppCompatActivity {
                             double snowVolume = checkSnow(weatherResponse);
                             int cloudinessPercentage = calculateCloudinessPercentage(weatherResponse);
 
+
+                            updateLocationTextView(city);
+                            updateTemperatureTextView(temperature);
+                            updateHumidityTextView(humidity);
+                            updateFeelsLikeTemperatureTextView(feelsLikeTemperature);
+                            updateMaxTemperatureTextView(maxTemperature);
+                            updateMinTemperatureTextView(minTemperature);
+                            updateWindTextView(windSpeed, windDirection);
+                            updatePressureTextView(pressure);
+                            updateLatitudeTextView(latitude);
+                            updateLongitudeTextView(longitude);
+                            updateVisibilityTextView(visibility);
+                            updateRainTextView(rainVolume);
+                            updateSnowTextView(snowVolume);
+                            updateCloudinessTextView(cloudinessPercentage);
+                            updateSunriseSunsetTextView(sunrise, sunset);
+
+                            lastRequestTime = System.currentTimeMillis();
+                            requestCount++;
+
+
                             long endTime = System.currentTimeMillis();
                             long elapsedTime = endTime - currentTime;
 
@@ -411,27 +435,9 @@ public class GlobalWeather extends AppCompatActivity {
                             Log.d("WeatherData", "Восход солнца: " + sunrise);
                             Log.d("WeatherData", "Закат солнца: " + sunset);
                             Log.d("WeatherData", "Получены данные для " + city + " за " + elapsedTime + " мс");
-
-                            updateLocationTextView(city);
-                            updateTemperatureTextView(temperature);
-                            updateHumidityTextView(humidity);
-                            updateFeelsLikeTemperatureTextView(feelsLikeTemperature);
-                            updateMaxTemperatureTextView(maxTemperature);
-                            updateMinTemperatureTextView(minTemperature);
-                            updateWindTextView(windSpeed, windDirection);
-                            updatePressureTextView(pressure);
-                            updateLatitudeTextView(latitude);
-                            updateLongitudeTextView(longitude);
-                            updateVisibilityTextView(visibility);
-                            updateRainTextView(rainVolume);
-                            updateSnowTextView(snowVolume);
-                            updateCloudinessTextView(cloudinessPercentage);
-                            updateSunriseSunsetTextView(sunrise, sunset);
-
-                            lastRequestTime = System.currentTimeMillis();
-                            requestCount++;
                         }
                     }
+
                     @Override
                     public void onFailure(Call<WeatherResponse> call, Throwable t) {
                         Log.e("WeatherData", "Ошибка получения данных о погоде: " + t.getMessage());
@@ -442,6 +448,7 @@ public class GlobalWeather extends AppCompatActivity {
             }
         }
     }
+
     // Обновление методов проверки осадков и облачности
     private double checkRain(WeatherResponse weatherResponse) {
         if (weatherResponse.getRainInfo() != null) {
