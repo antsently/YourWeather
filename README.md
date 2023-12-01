@@ -17,7 +17,7 @@ YourWeather - это простое приложение, написанное �
 
 Приложение размещено в некоторых маркетах
 1. RuStore: https://apps.rustore.ru/app/com.app.yourWeather
-2. AppGallery: https://appgallery.huawei.com/app/C109678877
+2. AppGallery: ~~https://appgallery.huawei.com/app/C109678877~~ (убран)
     
 ## API
 #### Запрос
